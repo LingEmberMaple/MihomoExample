@@ -70,6 +70,13 @@ proxy-providers-anchor:
   sub: &sub
     type: http
     interval: 7200
+    health-check:
+      enable: true
+      url: https://www.google.com/generate_204
+      interval: 300
+      timeout: 5000
+      lazy: false
+      expected-status: 204
 
 proxy-providers:
   {NAME}:
@@ -85,6 +92,7 @@ proxy-groups-anchor:
     lazy: false
     timeout: 5000
     include-all: true
+    expected-status: 204
 
 proxy-groups:
 - name: Proxy
