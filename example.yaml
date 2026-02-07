@@ -1,1 +1,353 @@
+allow-lan: false
+mode: rule
+log-level: info
+ipv6: true
+profile:
+  store-selected: true
+  store-fake-ip: true
 
+unified-delay: true
+tcp-concurrent: true
+
+dns:
+  enable: true
+  cache-algorithm: arc
+  prefer-h3: true
+  ipv6: true
+  enhanced-mode: fake-ip
+  fake-ip-filter:
+  - rule-set:private_domain
+  - rule-set:cn_domain
+
+  use-system-hosts: false
+  default-nameserver:
+  - tls://119.29.29.29
+  - tls://223.5.5.5
+
+  nameserver:
+  - https://doh.pub/dns-query
+  - https://dns.alidns.com/dns-query
+
+sniffer:
+  enable: true
+  sniff:
+    HTTP:
+      ports:
+      - 80
+      - 8080-8880
+
+    TLS:
+      ports:
+      - 443
+      - 8443
+
+    QUIC:
+      ports:
+      - 443
+      - 8443
+
+tun:
+  enable: true
+  stack: mixed
+  auto-route: true
+  auto-redirect: true
+  auto-detect-interface: true
+  dns-hijack:
+  - any:53
+  - tcp://any:53
+
+  strict-route: true
+  mtu: 9000
+
+proxies:
+  - name: {NAME}
+    type: {TYPE}
+    server: {SERVER}
+    port: {PORT}
+    udp: true
+
+proxy-providers-anchor:
+  sub: &sub
+    type: http
+    interval: 7200
+
+proxy-providers:
+  {NAME}:
+    <<: *sub
+    url: {URL}
+    path: ./proxy_providers/{NAME}.ymal
+
+proxy-groups-anchor:
+  proxy: &proxy
+    type: select
+    url: https://www.google.com/generate_204
+    interval: 300
+    timeout: 5000
+    include-all: true
+
+proxy-groups:
+- name: Proxy
+  <<: *proxy
+  proxies:
+  - DIRECT
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
+- name: CN Rule
+  <<: *proxy
+  proxies:
+  - DIRECT
+  - Proxy
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
+- name: CN Games
+  <<: *proxy
+  proxies:
+  - DIRECT
+  - PASS
+  - Proxy
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
+- name: QUIC
+  <<: *proxy
+  proxies:
+  - PASS
+  - REJECT
+  - Proxy
+  - DIRECT
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
+- name: AI Chat
+  <<: *proxy
+  proxies:
+  - Proxy
+  - PASS
+  - DIRECT
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
+- name: Youtube
+  <<: *proxy
+  proxies:
+  - Proxy
+  - PASS
+  - DIRECT
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
+- name: Google
+  <<: *proxy
+  proxies:
+  - Proxy
+  - PASS
+  - DIRECT
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
+- name: Github
+  <<: *proxy
+  proxies:
+  - Proxy
+  - PASS
+  - DIRECT
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
+- name: Microsoft
+  <<: *proxy
+  proxies:
+  - DIRECT
+  - PASS
+  - Proxy
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
+- name: Telegram
+  <<: *proxy
+  proxies:
+  - Proxy
+  - PASS
+  - DIRECT
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
+- name: Default
+  <<: *proxy
+  proxies:
+  - Proxy
+  - DIRECT
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
+- name: HK
+  <<: *proxy
+  filter: (?i)港|HK
+
+- name: JP
+  <<: *proxy
+  filter: (?i)日|JP
+
+- name: TW
+  <<: *proxy
+  filter: (?i)台|TW
+
+- name: SG
+  <<: *proxy
+  filter: (?i)新|SG
+
+- name: US
+  <<: *proxy
+  filter: (?i)美|US
+
+rules:
+- AND,((PROCESS-NAME,avp.exe),(DOMAIN,ds.kaspersky.com)),DIRECT
+- AND,((PROCESS-NAME,qbittorrent.exe),(IN-TYPE,Tun)),DIRECT
+- AND,((PROCESS-NAME,svchost.exe),(DST-PORT,7680)),DIRECT
+- AND,((PROCESS-NAME,tailscaled.exe),(DST-PORT,3478)),DIRECT
+
+- RULE-SET,private_domain,DIRECT
+- AND,((NOT,((RULE-SET,cn_domain))),(NETWORK,UDP),(DST-PORT,443/8443)),QUIC
+- RULE-SET,category-ai-chat-!cn_domain,AI Chat
+- RULE-SET,youtube_domain,Youtube
+- RULE-SET,google_domain,Google
+- RULE-SET,github_domain,Github
+- RULE-SET,microsoft_domain,Microsoft
+- RULE-SET,telegram_domain,Telegram
+- RULE-SET,category-games@cn_domain,CN Games
+- RULE-SET,category-game-accelerator-cn_domain,CN Games
+- RULE-SET,cn_domain,CN Rule
+- RULE-SET,geolocation-!cn_domain,Proxy
+
+- RULE-SET,private_ip,DIRECT,no-resolve
+- AND,((NOT,((RULE-SET,cn_ip))),(NETWORK,UDP),(DST-PORT,443/8443)),QUIC
+- RULE-SET,google_ip,Google,no-resolve
+- RULE-SET,telegram_ip,Telegram,no-resolve
+- RULE-SET,cn_ip,CN Rule
+
+- MATCH,Default
+
+rule-providers-anchors:
+  domain: &domain
+    type: http
+    interval: 7200
+    behavior: domain
+    format: mrs
+
+  ip: &ip
+    type: http
+    interval: 7200
+    behavior: ipcidr
+    format: mrs
+
+rule-providers:
+  private_domain:
+    <<: *domain
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/private.mrs
+    path: ./rule_providers/domain/private.mrs
+
+  cn_domain:
+    <<: *domain
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/cn.mrs
+    path: ./rule_providers/domain/cn.mrs
+
+  category-games@cn_domain:
+    <<: *domain
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/category-games@cn.mrs
+    path: ./rule_providers/domain/category-games@cn.mrs
+
+  category-game-accelerator-cn_domain:
+    <<: *domain
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/category-game-accelerator-cn.mrs
+    path: ./rule_providers/domain/category-game-accelerator-cn.mrs
+
+  geolocation-!cn_domain:
+    <<: *domain
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/geolocation-!cn.mrs
+    path: ./rule_providers/domain/geolocation-!cn.mrs
+
+  category-ai-chat-!cn_domain:
+    <<: *domain
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/category-ai-chat-!cn.mrs
+    path: ./rule_providers/domain/category-ai-chat-!cn_domain.mrs
+
+  youtube_domain:
+    <<: *domain
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/youtube.mrs
+    path: ./rule_providers/domain/youtube_domain.mrs
+
+  google_domain:
+    <<: *domain
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/google.mrs
+    path: ./rule_providers/domain/google.mrs
+
+  github_domain:
+    <<: *domain
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/github.mrs
+    path: ./rule_providers/domain/github.mrs
+
+  microsoft_domain:
+    <<: *domain
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/microsoft.mrs
+    path: ./rule_providers/domain/microsoft.mrs
+
+  telegram_domain:
+    <<: *domain
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geosite/telegram.mrs
+    path: ./rule_providers/domain/telegram.mrs
+
+
+  private_ip:
+    <<: *ip
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geoip/private.mrs
+    path: ./rule_providers/ip/private.mrs
+
+  cn_ip:
+    <<: *ip
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geoip/cn.mrs
+    path: ./rule_providers/ip/cn.mrs
+
+  google_ip:
+    <<: *ip
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geoip/google.mrs
+    path: ./rule_providers/ip/google.mrs
+
+  telegram_ip:
+    <<: *ip
+    url: https://ghfast.top/https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/geo/geoip/telegram.mrs
+    path: ./rule_providers/ip/telegram.mrs
