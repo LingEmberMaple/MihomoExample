@@ -82,7 +82,7 @@ proxy-providers:
   {NAME}:
     <<: *sub
     url: {URL}
-    path: ./proxy_providers/{NAME}.ymal
+    path: ./proxy_providers/{NAME}.yaml
 
 proxy-groups-anchor:
   proxy: &proxy
