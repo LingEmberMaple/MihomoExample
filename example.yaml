@@ -72,7 +72,7 @@ proxy-providers-anchor:
     interval: 7200
     health-check:
       enable: true
-      url: https://www.google.com/generate_204
+      url: https://www.gstatic.com/generate_204
       interval: 300
       timeout: 5000
       lazy: false
@@ -87,7 +87,7 @@ proxy-providers:
 proxy-groups-anchor:
   proxy: &proxy
     type: select
-    url: https://www.google.com/generate_204
+    url: https://www.gstatic.com/generate_204
     interval: 300
     lazy: false
     timeout: 5000
@@ -226,23 +226,23 @@ proxy-groups:
 
 - name: HK
   <<: *proxy
-  filter: (?i)港|HK
+  filter: (?i)香港|HK
 
 - name: JP
   <<: *proxy
-  filter: (?i)日|JP
+  filter: (?i)日本|JP
 
 - name: TW
   <<: *proxy
-  filter: (?i)台|TW
+  filter: (?i)台湾|TW
 
 - name: SG
   <<: *proxy
-  filter: (?i)新|SG
+  filter: (?i)新加坡|SG
 
 - name: US
   <<: *proxy
-  filter: (?i)美|US
+  filter: (?i)美国|US
 
 rules:
 - AND,((PROCESS-NAME,avp.exe),(DOMAIN,ds.kaspersky.com)),DIRECT
