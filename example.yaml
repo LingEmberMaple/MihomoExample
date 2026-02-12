@@ -226,23 +226,23 @@ proxy-groups:
 
 - name: HK
   <<: *proxy
-  filter: (?i)香港|HK
+  filter: (?i)香港|HK|Hong Kong
 
 - name: JP
   <<: *proxy
-  filter: (?i)日本|JP
+  filter: (?i)日本|JP|Japan
 
 - name: TW
   <<: *proxy
-  filter: (?i)台湾|TW
+  filter: (?i)台湾|TW|Taiwan
 
 - name: SG
   <<: *proxy
-  filter: (?i)新加坡|SG
+  filter: (?i)新加坡|SG|Singapore
 
 - name: US
   <<: *proxy
-  filter: (?i)美国|US
+  filter: (?i)美国|US|America
 
 rules:
 - AND,((PROCESS-NAME,avp.exe),(DOMAIN,ds.kaspersky.com)),DIRECT
