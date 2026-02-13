@@ -246,6 +246,7 @@ proxy-groups:
 
 rules:
 - AND,((PROCESS-NAME,avp.exe),(DOMAIN,ds.kaspersky.com)),DIRECT
+- AND,((PROCESS-NAME-WILDCARD,PeerBanHelper-*GUI*.exe),(IN-TYPE,Tun)),DIRECT
 - AND,((PROCESS-NAME,qbittorrent.exe),(IN-TYPE,Tun)),DIRECT
 - AND,((PROCESS-NAME,svchost.exe),(DST-PORT,7680)),DIRECT
 - AND,((PROCESS-NAME,tailscaled.exe),(DST-PORT,3478)),DIRECT
