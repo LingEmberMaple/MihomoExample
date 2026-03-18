@@ -192,8 +192,8 @@ proxy-groups:
 - name: Microsoft
   <<: *proxy
   proxies:
-  - PASS
   - DIRECT
+  - PASS
   - Proxy
   - HK
   - JP
@@ -242,7 +242,7 @@ proxy-groups:
 
 - name: US
   <<: *proxy
-  filter: (?i)美国|US|America
+  filter: (?i)美国|US|America|United States
 
 rules:
 - AND,((PROCESS-NAME,avp.exe),(DOMAIN,ds.kaspersky.com)),DIRECT
