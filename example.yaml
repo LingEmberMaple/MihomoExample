@@ -192,8 +192,8 @@ proxy-groups:
 - name: Microsoft
   <<: *proxy
   proxies:
-  - PASS
   - DIRECT
+  - PASS
   - Proxy
   - HK
   - JP
