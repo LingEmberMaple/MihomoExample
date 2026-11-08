@@ -266,6 +266,8 @@ rules:
 - RULE-SET,private_domain,DIRECT
 - DOMAIN,www.bilibili.com,Bili Unlock
 - DOMAIN,api.bilibili.com,Bili Unlock
+- DOMAIN,www.bilibili.tv,Bili Unlock
+- DOMAIN,api.bilibili.tv,Bili Unlock
 - DOMAIN,grpc.biliapi.net,Bili Unlock
 - AND,((NOT,((RULE-SET,cn_domain))),(NETWORK,UDP),(DST-PORT,443/8443)),QUIC
 - RULE-SET,category-ai-chat-!cn_domain,AI Chat
