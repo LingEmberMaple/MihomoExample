@@ -128,6 +128,18 @@ proxy-groups:
   - SG
   - US
 
+- name: Bili Unlock
+  <<: *proxy
+  proxies:
+  - PASS
+  - DIRECT
+  - Proxy
+  - HK
+  - JP
+  - TW
+  - SG
+  - US
+
 - name: QUIC
   <<: *proxy
   proxies:
@@ -252,6 +264,7 @@ rules:
 - AND,((PROCESS-NAME,tailscaled.exe),(DST-PORT,3478)),DIRECT
 
 - RULE-SET,private_domain,DIRECT
+- DOMAIN,grpc.biliapi.net,Bili Unlock
 - AND,((NOT,((RULE-SET,cn_domain))),(NETWORK,UDP),(DST-PORT,443/8443)),QUIC
 - RULE-SET,category-ai-chat-!cn_domain,AI Chat
 - RULE-SET,youtube_domain,Youtube
