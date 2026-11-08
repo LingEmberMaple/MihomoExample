@@ -69,7 +69,7 @@ proxies:
 proxy-providers-anchor:
   sub: &sub
     type: http
-    interval: 7200
+    interval: 43200
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
@@ -292,13 +292,13 @@ rules:
 rule-providers-anchors:
   domain: &domain
     type: http
-    interval: 7200
+    interval: 43200
     behavior: domain
     format: mrs
 
   ip: &ip
     type: http
-    interval: 7200
+    interval: 43200
     behavior: ipcidr
     format: mrs
 
